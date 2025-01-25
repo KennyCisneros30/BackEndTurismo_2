@@ -14,6 +14,7 @@ namespace APITurismo.Controllers
     [ApiController]
     public class ExcursionController : ControllerBase
     {
+        //private readonly guiaContext _context;
         private readonly excursionContext _context;
 
         public ExcursionController(excursionContext context)

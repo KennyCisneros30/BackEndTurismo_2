@@ -25,7 +25,9 @@ namespace APITurismo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Actividad>>> GetActividads()
         {
-            return await _context.Actividads.ToListAsync();
+            return await _context.Actividads
+                .Where(a => a.Active == true)
+                .ToListAsync();
         }
 
         // GET: api/Actividad/5
@@ -84,7 +86,41 @@ namespace APITurismo.Controllers
             return CreatedAtAction("GetActividad", new { id = actividad.Id }, actividad);
         }
 
-        // DELETE: api/Actividad/5
+        // Eliminacion lógica
+        // Put: api/Movies/deactive/5 , hay que tener diferentes url para los metodos
+        [HttpPut("deactive/{id}")]//es para modificaciones
+        public async Task<IActionResult> DeactiveActividad(int id)
+        {
+            var actividad = await _context.Actividads.FindAsync(id);
+            if (actividad == null)
+            {
+                return NotFound("Actividad no encontrada para eliminar");
+            }
+
+            //eliminacion lógica
+            actividad.Active = false;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                //SaveChangesAsync permite guardar los cambios
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ActividadExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        /*// DELETE: api/Actividad/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActividad(int id)
         {
@@ -98,7 +134,7 @@ namespace APITurismo.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
+        }*/
 
         private bool ActividadExists(int id)
         {

@@ -16,6 +16,8 @@ public partial class guiaContext : DbContext
     {
     }
 
+
+    public virtual DbSet<Excursion> Excursion { get; set; }
     public virtual DbSet<Guia> Guia { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -24,14 +26,35 @@ public partial class guiaContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        
+        modelBuilder.Entity<Excursion>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Excursio__3214EC073D9C235D");
+
+            entity.ToTable("Excursion");
+
+            entity.Property(e => e.GuideLanguage).HasMaxLength(50);
+            entity.Property(e => e.Image).HasMaxLength(255);
+            entity.Property(e => e.Name).HasMaxLength(255);
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+        });
+
         modelBuilder.Entity<Guia>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Guia__3214EC07D5976660");
 
-            entity.Property(e => e.Excursion).HasMaxLength(255);
+            entity.ToTable("Guia");
+
+            
             entity.Property(e => e.Image).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.Years_of_Experience).HasMaxLength(50);
+
+            entity.HasOne(d => d.Excursion).WithMany(p => p.Guia)
+                .HasForeignKey(d => d.ExcursionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ExcursionID");
+
         });
 
         OnModelCreatingPartial(modelBuilder);
@@ -39,3 +62,11 @@ public partial class guiaContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+
+
+
+
+
+
+
+

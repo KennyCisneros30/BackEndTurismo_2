@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Data.Models;
 
@@ -18,4 +19,8 @@ public partial class Excursion
     public decimal Price { get; set; }
 
     public string Image { get; set; } = null!;
+
+    [JsonIgnore] 
+
+    public virtual ICollection<Guia>Guia { get; set; } = new List<Guia>();
 }

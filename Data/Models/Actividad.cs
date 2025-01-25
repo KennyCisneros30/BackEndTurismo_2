@@ -13,9 +13,9 @@ public partial class Actividad
 
     public string Category { get; set; } = null!;
 
-    public bool Rating { get; set; }
-
     public string Image { get; set; } = null!;
 
     public decimal Price { get; set; }
+
+    public bool Active { get; set; }
 }

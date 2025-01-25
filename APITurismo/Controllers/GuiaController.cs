@@ -25,7 +25,9 @@ namespace APITurismo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Guia>>> GetGuia()
         {
-            return await _context.Guia.ToListAsync();
+            return await _context.Guia.Include(g => g.Excursion)
+                .Where(g => g.Active == true)
+                .ToListAsync();
         }
 
         // GET: api/Guias/5
@@ -84,7 +86,41 @@ namespace APITurismo.Controllers
             return CreatedAtAction("GetGuia", new { id = guia.Id }, guia);
         }
 
-        // DELETE: api/Guias/5
+        // Eliminacion lógica
+        // Put: api/Movies/deactive/5 , hay que tener diferentes url para los metodos
+        [HttpPut("deactive/{id}")]//es para modificaciones
+        public async Task<IActionResult> DeactiveGuia(int id)
+        {
+
+            var guia = await _context.Guia.FindAsync(id);
+            if (guia == null)
+            {
+                return NotFound("Guia no encontrado para eliminar");
+            }
+            //eliminacion lógica
+            guia.Active = false;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                //SaveChangesAsync permite guardar los cambios
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!GuiaExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        /*// DELETE: api/Guias/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGuia(int id)
         {
@@ -98,7 +134,7 @@ namespace APITurismo.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
+        }*/
 
         private bool GuiaExists(int id)
         {
