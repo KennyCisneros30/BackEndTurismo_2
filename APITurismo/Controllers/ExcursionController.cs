@@ -26,7 +26,7 @@ namespace APITurismo.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Excursion>>> GetExcursions()
         {
-            return await _context.Excursions.ToListAsync();
+            return await _context.Excursions.Where(m => m.Active).ToListAsync();
         }
 
         // GET: api/Excursions/5
@@ -84,22 +84,57 @@ namespace APITurismo.Controllers
 
             return CreatedAtAction("GetExcursion", new { id = excursion.Id }, excursion);
         }
+                
+        //Eliminación lógica
+        //PUT: api/Excursions/deactive/5
+        [HttpPut("deactive/{id}")] 
+        public async Task<IActionResult> DeactiveExcursion(int id)
+        {
+            var excursion = await _context.Excursions.FindAsync(id);
+            if (excursion == null)
+            {
+                return NotFound("Excursion no encontrada para eliminar");
+            }
+            //eliminacion logica
+            excursion.Active = false;
 
+            try
+            {
+                await _context.SaveChangesAsync();
+                // SaveChangesAsync permite guardar los cambios
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ExcursionExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        /*
         // DELETE: api/Excursions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExcursion(int id)
         {
             var excursion = await _context.Excursions.FindAsync(id);
             if (excursion == null)
-            {
-                return NotFound();
-            }
-
-            _context.Excursions.Remove(excursion);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+        {
+            return NotFound();
         }
+
+        _context.Excursions.Remove(excursion);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+        }
+        */
 
         private bool ExcursionExists(int id)
         {

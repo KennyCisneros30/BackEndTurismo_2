@@ -20,6 +20,8 @@ public partial class Excursion
 
     public string Image { get; set; } = null!;
 
+    public bool Active { get; set; }
+
     [JsonIgnore] 
 
     public virtual ICollection<Guia>Guia { get; set; } = new List<Guia>();
